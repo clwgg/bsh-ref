@@ -1,0 +1,100 @@
+* [B]AM [S]ample [H]aplotypes - with reference data
+** About
+
+*bsh-ref* allows the sampling of bases from alignments (mappings) stored in BAM files
+at positions defined in a ~.map~ file. The most common use case will be that
+population genotypes exist in a ~.map~ and ~.ped~ file pair (see [[https://www.cog-genomics.org/plink2/formats][here]] for file
+format descriptions) as created by PLINK, and genotypes are to be sampled from
+one or more BAM files at the positions for which population genotypes exist
+already.
+
+Additionally, *bsh-ref* allows to assess the fraction of derived alleles that a
+set of query samples share with combinations of user-defined test samples,
+polarized by a set of outgroup individuals.
+
+** Get it
+
+To use *bsh-ref*, you will need a Linux machine where the gcc compiler,
+as well as the libz, libm and libpthread system libraries are
+installed.
+To acquire *bsh-ref*, first clone the repository recursively:
+
+#+BEGIN_SRC sh
+git clone --recursive https://github.com/clwgg/bsh-ref
+#+END_SRC
+
+This will clone both the *bsh-ref* code, as well as the htslib module,
+which is its only external dependency. After cloning, first compile
+the submodule, and then the *bsh-ref* code:
+
+#+BEGIN_SRC sh
+cd bsh-ref
+make submodules
+make
+#+END_SRC
+
+This will create the *bsh-ref* binary, which you can copy or move
+anywhere for subsequent use.
+
+*** Updating
+
+When updating to the current version, please make sure to also update the
+submodules:
+
+#+BEGIN_SRC sh
+git pull origin master
+git submodule update
+make submodules
+make
+#+END_SRC
+
+** Usage
+
+#+BEGIN_SRC bash :results output :exports results
+./bsh-ref; echo
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+Usage: ./bsh-ref [options] -m in.map [-p in.ped | -b in.lst]
+
+Options:
+	-m	map file containing positions (required)
+	-p	ped file containing known individuals (at least one of -p and -b)
+	-b	bam list file containing new individuals (at least one of -p and -b)
+	-o	outfile basename (default: out)
+
+	-a	sample 1 allele (pseudo-haploid) or 2 (default: 1)
+	-r	sample each bam file -r times (default: 1)
+	-q	min map quality (default: 0)
+	-s	create stat file for bam sampling
+	-c	restrict base sampling to reads with terminal C-to-T in one (1) or both (2) ends (default: 0)
+	  	(Warning: this is so far only implemented for single stranded libraries, which also have C-to-T at 3p)
+
+	-t	ancestral vs. derived file (needs -p)
+
+
+#+end_example
+
+*** BAM list file (~-b~)
+This file should be of the format ~name\tpath\n~, with ~path~ being the path to
+a (previously indexed) BAM file, and ~name~ representing the name by which the
+genotype of this samples will later be identified (e.g. in the ~.ped~ file).
+The file may contain multiple lines, if genotypes should be sampled from
+multiple BAM files.
+
+*** Shared derived allele file (~-t~)
+This file should be of the format ~flag fid iid\n~, with ~fid~ representing the
+family ID, and ~iid~ the within-family ID in the supplied PED file (see [[https://www.cog-genomics.org/plink2/formats#fam][here]]).
+The ~flag~ field may take the values 1, 2 or 3, indicating the use of this
+individual as ancestral, test or query sample in the shared derived allele test,
+respectively. All individuals sampled from BAM files (~-b~) are automatically
+used as query samples as well.
+
+*** Terminal C-to-T conversions (~-c~)
+If the ~-c~ flag is set, the sampling will only consider bases from reads that
+carry terminal C-to-T conversions in either the first or the last base. This is
+so far only implemented for single-stranded libraries, which have C-to-T
+conversions at both ends, rather then carrying G-to-A conversions at the 3' end
+due to the fill-in repair.
