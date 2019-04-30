@@ -80,9 +80,15 @@ Options:
 *** BAM list file (~-b~)
 This file should be of the format ~name\tpath\n~, with ~path~ being the path to
 a (previously indexed) BAM file, and ~name~ representing the name by which the
-genotype of this samples will later be identified (e.g. in the ~.ped~ file).
+genotype of this sample will later be identified (e.g. in the ~.ped~ file).
 The file may contain multiple lines, if genotypes should be sampled from
 multiple BAM files.
+
+Example file:
+#+begin_example
+sample1	path/to/sample1.bam
+sample2	path/to/sample2.bam
+#+end_example
 
 *** Shared derived allele file (~-t~)
 This file should be of the format ~flag fid iid\n~, with ~fid~ representing the
@@ -91,6 +97,17 @@ The ~flag~ field may take the values 1, 2 or 3, indicating the use of this
 individual as ancestral, test or query sample in the shared derived allele test,
 respectively. All individuals sampled from BAM files (~-b~) are automatically
 used as query samples as well.
+
+Example file:
+#+begin_example
+1 outgroup indiv1
+1 outgroup indiv2
+2 testpop1 indiv1
+2 testpop2 indiv1
+2 testpop3 indiv1
+3 querypop1 indiv1
+3 querypop2 indiv1
+#+end_example
 
 *** Terminal C-to-T conversions (~-c~)
 If the ~-c~ flag is set, the sampling will only consider bases from reads that
