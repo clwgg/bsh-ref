@@ -38,8 +38,16 @@ int read_aux(char *blist, int mapQ, aux_t *data, int l, int ctot_flag)
     }
 
     char *name, *bfile;
-    name = strtok(str.s, "\t");
-    bfile = strtok(0, "\t");
+    name = strtok(str.s, " \t");
+    bfile = strtok(0, " \t");
+
+    if (!bfile) {
+      gzclose(file);
+      ks_destroy(ks);
+      free(str.s);
+
+      return -2;
+    }
 
     data[i].name = malloc(sizeof *name * str.m);
     memset(data[i].name, 0, sizeof *name * str.m);
