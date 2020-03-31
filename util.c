@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <zlib.h>
+#include <limits.h>
 
 #include "util.h"
 
